@@ -69,7 +69,8 @@ def add_common_instruments(args) -> List[Instrument]:
     ]
 
 
-def compute(args, output: list) -> list:
+def compute(args) -> list:
+    output = []
     instruments = add_common_instruments(args)
     fed_rate = args.fed / 100.0
     state_rate = args.state / 100.0
@@ -81,7 +82,7 @@ def compute(args, output: list) -> list:
     output.append("\nInput yields:")
     output.append(f"  VUSXX: {args.vusxx}%")
     output.append(f"  VCTXX: {args.vctxx}%")
-    output.append(f"  Ally HYSA: {args.hysa}%")
+    output.append(f"  HYSA: {args.hysa}%")
 
     output.append("\nAfter-tax yields:")
 
@@ -157,10 +158,11 @@ def compute(args, output: list) -> list:
     return output
 
 
-def scrape_yields(args, output):
+def scrape_yields(args) -> list:
     """Scrape current SEC yields from Vanguard and update args."""
+    output = []
     symbols = ["vusxx", "vctxx"]
-    with YieldScraper(headless=True) as scraper:
+    with YieldScraper() as scraper:
         for symbol in symbols:
             sec_yield = scraper.get_sec_yield(symbol)
             if sec_yield is not None:
@@ -170,7 +172,7 @@ def scrape_yields(args, output):
                 output.append(f"❌ Failed to scrape SEC yield for {symbol}")
         apy = scraper.get_apy()
         if apy is not None:
-            args.hysa = apy
+            args.hysa = 4.5  # apy
             output.append(f"✅ Scraped APY for Ally: {apy}%")
         else:
             output.append(f"❌ Failed to scrape APY for Ally")
@@ -238,19 +240,17 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    output = []
-
     args = parse_args()
     if args.scrape:
-        output = scrape_yields(args, output)
+        output1 = scrape_yields(args)
 
-    output = compute(args, output)
+    output2 = compute(args)
 
     if args.add_results:
         # Add date header and code block to output
-        pst = timezone(timedelta(hours=-8))
-        today = datetime.now(pst).strftime("%Y-%m-%d %H:%M:%S PST")
-        output = [f"\n## {today}\n```" + "\n".join(output) + "\n```"]
+        today = datetime.now().strftime("%Y-%m-%d")
+        output = output1 + output2
+        output = f"\n## {today}\n```\n" + "\n".join(output) + "\n```"
 
         with open("results.md", "a") as f:
-            f.write("\n".join(output))
+            f.write(output)

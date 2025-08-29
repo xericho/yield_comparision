@@ -1,6 +1,8 @@
 name: Calculate Yields
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
 jobs:
   calculate_yields:
     runs-on: ubuntu-latest

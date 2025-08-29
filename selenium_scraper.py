@@ -93,13 +93,6 @@ class YieldScraper:
                 print(f"✅ Found SEC yield for {symbol.upper()}: {sec_yield}%")
                 return sec_yield
 
-            # Strategy 2: Look for yield information in tables or data sections
-            sec_yield = self._extract_from_performance_data(soup)
-
-            if sec_yield is not None:
-                print(f"✅ Found SEC yield for {symbol.upper()}: {sec_yield}%")
-                return sec_yield
-
             print(f"❌ SEC yield not found for {symbol.upper()}")
             return None
 
@@ -134,32 +127,6 @@ class YieldScraper:
                         return yield_value
                 except (ValueError, IndexError):
                     continue
-
-        return None
-
-    def _extract_from_performance_data(self, soup: BeautifulSoup) -> Optional[float]:
-        """Try to extract SEC yield from performance tables or data sections."""
-
-        # Look for tables or divs that might contain yield data
-        potential_containers = soup.find_all(
-            ["table", "div", "section"],
-            string=re.compile(r"yield|performance", re.IGNORECASE),
-        )
-
-        for container in potential_containers:
-            # Look for parent elements that might contain the data
-            parent = container.find_parent()
-            if parent:
-                text = parent.get_text()
-                # Look for percentage values near yield mentions
-                yield_match = re.search(r"(\d+\.?\d*)\s*%", text)
-                if yield_match:
-                    try:
-                        yield_value = float(yield_match.group(1))
-                        if 0 <= yield_value <= 20:
-                            return yield_value
-                    except ValueError:
-                        continue
 
         return None
 
