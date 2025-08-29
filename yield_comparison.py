@@ -69,7 +69,7 @@ def add_common_instruments(args) -> List[Instrument]:
     ]
 
 
-def compute(args) -> list:
+def compute(args, output: list) -> None:
     instruments = add_common_instruments(args)
     fed_rate = args.fed / 100.0
     state_rate = args.state / 100.0
@@ -154,10 +154,9 @@ def compute(args) -> list:
 
     # Print all collected output at the end
     print("\n".join(output))
-    return output
 
 
-def scrape_vanguard_yields(args):
+def scrape_vanguard_yields(args, output):
     """Scrape current SEC yields from Vanguard and update args."""
     symbols = ["vusxx", "vctxx"]
     with VanguardScraper(headless=True) as scraper:
@@ -165,14 +164,20 @@ def scrape_vanguard_yields(args):
             sec_yield = scraper.get_sec_yield(symbol)
             if sec_yield is not None:
                 args.__setattr__(symbol, sec_yield)
+                output.append(f"✅ Scraped SEC yield for {symbol}: {sec_yield}%")
+            else:
+                output.append(f"❌ Failed to scrape SEC yield for {symbol}")
 
 
-def scrape_ally_apy(args):
+def scrape_ally_apy(args, output):
     """Scrape current APY from Ally Bank and update args."""
     with AllyScraper(headless=True) as scraper:
         apy = scraper.get_apy()
         if apy is not None:
             args.hysa = apy
+            output.append(f"✅ Scraped APY for Ally: {apy}%")
+        else:
+            output.append(f"❌ Failed to scrape APY for Ally")
 
 
 def parse_args():
@@ -236,12 +241,14 @@ def parse_args():
 
 
 if __name__ == "__main__":
+    output = []
+
     args = parse_args()
     if args.scrape:
-        scrape_vanguard_yields(args)
-        scrape_ally_apy(args)
+        scrape_vanguard_yields(args, output)
+        scrape_ally_apy(args, output)
 
-    output = compute(args)
+    compute(args, output)
 
     if args.add_results:
         # Add date header and code block to output
