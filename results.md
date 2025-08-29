@@ -2,8 +2,8 @@
 
 ## 2025-08-29
 ```
-✅ Scraped SEC yield for vusxx: 4.24%
-✅ Scraped SEC yield for vctxx: 2.36%
+✅ Scraped SEC yield for VUSXX: 4.24%
+✅ Scraped SEC yield for VCTXX: 2.36%
 ✅ Scraped APY for Ally: 3.5%
 
 Principal: $100,000.00

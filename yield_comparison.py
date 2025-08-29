@@ -167,9 +167,11 @@ def scrape_yields(args) -> list:
             sec_yield = scraper.get_sec_yield(symbol)
             if sec_yield is not None:
                 args.__setattr__(symbol, sec_yield)
-                output.append(f"✅ Scraped SEC yield for {symbol}: {sec_yield}%")
+                output.append(
+                    f"✅ Scraped SEC yield for {symbol.upper()}: {sec_yield}%"
+                )
             else:
-                output.append(f"❌ Failed to scrape SEC yield for {symbol}")
+                output.append(f"❌ Failed to scrape SEC yield for {symbol.upper()}")
         apy = scraper.get_apy()
         if apy is not None:
             args.hysa = apy
