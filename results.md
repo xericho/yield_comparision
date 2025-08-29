@@ -19,3 +19,8 @@ Annual dollar differences:
   VUSXX - VCTXX: $523 (+22.17%)
   VCTXX - HYSA: $306 (+14.87%)
 ```
+## 2025-08-29
+```✅ Scraped APY for Ally: 0.39%
+❌ Failed to scrape SEC yield for vusxx
+❌ Failed to scrape SEC yield for vctxx
+```
