@@ -2,7 +2,7 @@ name: Scrape Yields
 on:
   workflow_dispatch:
 jobs:
-  scrape:
+  calculate_yields:
     runs-on: ubuntu-latest
     steps:
       - name: Checking out repo
@@ -11,14 +11,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Installing package list
-        run: apt list --installed    
+      - name: Update packages
+        run: sudo apt-get update
       - name: Removing previous chrome instances on runner 
         run: sudo apt purge google-chrome-stable  
         
        # Need to fetch reqs if needed
       - name: Installing all necessary packages
-        run: pip install chromedriver-autoinstaller selenium pyvirtualdisplay beautifulsoup4 lxml
+        run: pip install chromedriver-autoinstaller webdriver_manager selenium pyvirtualdisplay beautifulsoup4 lxml
       - name: Install xvfb
         run: sudo apt-get install xvfb
 
