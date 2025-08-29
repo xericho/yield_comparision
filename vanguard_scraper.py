@@ -5,11 +5,14 @@ import re
 from typing import Optional, Dict
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
+import platform
 
 
 class VanguardScraper:
@@ -26,7 +29,12 @@ class VanguardScraper:
             Timeout in seconds for page loads and element waits
         """
         self.timeout = timeout
-        self.driver = self._setup_driver(headless)
+        if platform.system() == "Linux":
+            from setup_selenium_driver import driver
+
+            self.driver = driver
+        else:
+            self.driver = self._setup_driver(headless)
 
     def _setup_driver(self, headless: bool) -> webdriver.Chrome:
         """Set up Chrome driver with appropriate options."""
@@ -39,12 +47,16 @@ class VanguardScraper:
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--window-size=1920,1080")
+        # chrome_options.add_argument("--window-size=1920,1080")
         chrome_options.add_argument(
             "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         )
+        # Disable images for faster loading
+        chrome_options.add_argument("--blink-settings=imagesEnabled=false")
 
-        return webdriver.Chrome(options=chrome_options)
+        return webdriver.Chrome(
+            service=Service(ChromeDriverManager().install()), options=chrome_options
+        )
 
     def get_sec_yield(self, symbol: str) -> Optional[float]:
         """Get SEC yield for a given Vanguard fund symbol.

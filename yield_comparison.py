@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import List
+from datetime import datetime
 import argparse
 
 from vanguard_scraper import VanguardScraper
@@ -68,19 +69,21 @@ def add_common_instruments(args) -> List[Instrument]:
     ]
 
 
-def compute(args) -> None:
+def compute(args) -> list:
     instruments = add_common_instruments(args)
     fed_rate = args.fed / 100.0
     state_rate = args.state / 100.0
 
-    print(f"\nPrincipal: ${args.principal:,.2f}")
+    output = []
 
-    print("\nInput yields:")
-    print(f"  VUSXX: {format_pct(args.vusxx)}")
-    print(f"  VCTXX: {format_pct(args.vctxx)}")
-    print(f"  HYSA: {format_pct(args.hysa)}")
+    output.append(f"\nPrincipal: ${args.principal:,.2f}")
 
-    print("\nAfter-tax yields:")
+    output.append("\nInput yields:")
+    output.append(f"  VUSXX: {args.vusxx}%")
+    output.append(f"  VCTXX: {args.vctxx}%")
+    output.append(f"  HYSA: {args.hysa}%")
+
+    output.append("\nAfter-tax yields:")
 
     results = []
     for inst in instruments:
@@ -97,7 +100,9 @@ def compute(args) -> None:
     # Print consolidated lines in ranking order showing rank, name, after-tax yield, dollars
     for inst, after_tax, annual_dollars in ranked:
         r = rank_map[inst.name]
-        print(f"  {r}. {inst.name}: {format_pct(after_tax)} -> ${annual_dollars:,.0f}")
+        output.append(
+            f"  {r}. {inst.name}: {format_pct(after_tax)} -> ${annual_dollars:,.0f}"
+        )
 
     # Specific pairwise differences for clarity
     def get(name: str):
@@ -110,7 +115,7 @@ def compute(args) -> None:
     vctxx_after_tax, vctxx_d = get("VCTXX")
     hysa_after_tax, hysa_d = get("HYSA")
 
-    print("\nAnnual dollar differences:")
+    output.append("\nAnnual dollar differences:")
 
     def diff_line(name_a: str, dollars_a: float, name_b: str, dollars_b: float) -> str:
         diff = dollars_a - dollars_b
@@ -122,9 +127,9 @@ def compute(args) -> None:
             pct_str = "N/A"
         return f"  {name_a} - {name_b}: ${diff:,.0f} ({pct_str})"
 
-    print(diff_line("VUSXX", vusxx_d, "HYSA", hysa_d))
-    print(diff_line("VUSXX", vusxx_d, "VCTXX", vctxx_d))
-    print(diff_line("VCTXX", vctxx_d, "HYSA", hysa_d))
+    output.append(diff_line("VUSXX", vusxx_d, "HYSA", hysa_d))
+    output.append(diff_line("VUSXX", vusxx_d, "VCTXX", vctxx_d))
+    output.append(diff_line("VCTXX", vctxx_d, "HYSA", hysa_d))
 
     # Sensitivity example: partial state taxation for VUSXX (if ever applicable)
     if args.vusxx_state_taxable_fraction is not None:
@@ -138,17 +143,21 @@ def compute(args) -> None:
                 state_taxable_fraction=fraction,
             )
             at_partial = vusxx_partial.after_tax_yield(fed_rate, state_rate)
-            print("\nSensitivity: VUSXX partially state-taxable")
-            print(f"  Assumed state-taxable fraction: {fraction*100:.1f}%")
-            print(
+            output.append("\nSensitivity: VUSXX partially state-taxable")
+            output.append(f"  Assumed state-taxable fraction: {fraction*100:.1f}%")
+            output.append(
                 f"  After-tax yield: {format_pct(at_partial)} (vs {format_pct(vusxx_after_tax)})"
             )
-            print(
+            output.append(
                 f"  Annual dollars: ${args.principal * at_partial:,.0f} (vs ${vusxx_d:,.0f})"
             )
 
+    # Print all collected output at the end
+    print("\n".join(output))
+    return output
 
-def get_vanguard_yields(args):
+
+def scrape_vanguard_yields(args):
     """Scrape current SEC yields from Vanguard and update args."""
     symbols = ["vusxx", "vctxx"]
     with VanguardScraper(headless=True) as scraper:
@@ -158,7 +167,7 @@ def get_vanguard_yields(args):
                 args.__setattr__(symbol, sec_yield)
 
 
-def get_ally_apy(args):
+def scrape_ally_apy(args):
     """Scrape current APY from Ally Bank and update args."""
     with AllyScraper(headless=True) as scraper:
         apy = scraper.get_apy()
@@ -212,18 +221,32 @@ def parse_args():
         default=0.0,
         help="If >0, treat that fraction of VUSXX yield as state-taxable for sensitivity (e.g. 0.05)",
     )
+    p.add_argument(
+        "--scrape",
+        "-s",
+        action="store_true",
+        help="Whether to scrape current yields",
+    )
+    p.add_argument(
+        "--add_results",
+        action="store_true",
+        help="Add results to results.md",
+    )
     return p.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    get_vanguard_yields(args)
-    get_ally_apy(args)
-    compute(args)
+    if args.scrape:
+        scrape_vanguard_yields(args)
+        scrape_ally_apy(args)
 
-    print(
-        "\nFor current yields, see:\n"
-        "  • VUSXX:  https://investor.vanguard.com/investment-products/mutual-funds/profile/vusxx\n"
-        "  • VCTXX:  https://investor.vanguard.com/investment-products/mutual-funds/profile/vctxx\n"
-        "  • HYSA:   https://www.ally.com/bank/online-savings-account/"
-    )
+    output = compute(args)
+
+    if args.add_results:
+        # Add date header and code block to output
+        today = datetime.now().strftime("%Y-%m-%d")
+        output = [f"\n## {today}\n```" + "\n".join(output) + "\n```"]
+
+        with open("results.md", "a") as f:
+            f.write("\n".join(output))
