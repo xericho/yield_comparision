@@ -13,17 +13,18 @@ jobs:
           python-version: '3.11'
       - name: Update packages
         run: sudo apt-get update
+      - name: Install xvfb
+        run: sudo apt-get install xvfb
       # - name: Removing previous chrome instances on runner 
       #   run: sudo apt purge google-chrome-stable  
       - name: Installing all necessary packages
         run: pip install chromedriver-autoinstaller webdriver_manager selenium pyvirtualdisplay beautifulsoup4 lxml
-      - name: Install xvfb
-        run: sudo apt-get install xvfb
       - name: Running the Python script
         run: python yield_comparison.py --scrape --add_results
       - name: Commit and push results
         run: |
-         git config --global user.name "github-actions[bot]"
-         git add -A
-         git commit -m "GitHub Actions results updated"
-         git push
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git add -A
+          git commit -m "GitHub Actions results updated"
+          git push

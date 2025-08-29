@@ -245,8 +245,8 @@ if __name__ == "__main__":
 
     args = parse_args()
     if args.scrape:
-        scrape_vanguard_yields(args, output)
         scrape_ally_apy(args, output)
+        scrape_vanguard_yields(args, output)
 
     compute(args, output)
 
