@@ -172,7 +172,7 @@ def scrape_yields(args) -> list:
                 output.append(f"❌ Failed to scrape SEC yield for {symbol}")
         apy = scraper.get_apy()
         if apy is not None:
-            args.hysa = 4.5  # apy
+            args.hysa = apy
             output.append(f"✅ Scraped APY for Ally: {apy}%")
         else:
             output.append(f"❌ Failed to scrape APY for Ally")
@@ -252,5 +252,13 @@ if __name__ == "__main__":
         output = output1 + output2
         output = f"\n## {today}\n```\n" + "\n".join(output) + "\n```"
 
-        with open("results.md", "a") as f:
-            f.write(output)
+        # Read existing file or create new one with header
+        with open("results.md", "r") as f:
+            lines = f.readlines()
+
+        # Insert output after the first line
+        lines = [lines[0]] + [output] + lines[1:]
+
+        # Write back to file
+        with open("results.md", "w") as f:
+            f.writelines(lines)

@@ -7,4 +7,4 @@ For current yields, see:
 - [Ally HYSA](https://www.ally.com/bank/online-savings-account/)
 
 ## Results
-Github actions will calculate yields and update [results.md](results.md).
+The latest yield calculations are available in [results.md](results.md).
