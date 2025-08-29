@@ -16,8 +16,7 @@ from typing import List
 from datetime import datetime
 import argparse
 
-from vanguard_scraper import VanguardScraper
-from ally_scraper import AllyScraper
+from selenium_scraper import YieldScraper
 from datetime import timezone, timedelta
 
 
@@ -158,10 +157,10 @@ def compute(args, output: list) -> list:
     return output
 
 
-def scrape_vanguard_yields(args, output):
+def scrape_yields(args, output):
     """Scrape current SEC yields from Vanguard and update args."""
     symbols = ["vusxx", "vctxx"]
-    with VanguardScraper(headless=True) as scraper:
+    with YieldScraper(headless=True) as scraper:
         for symbol in symbols:
             sec_yield = scraper.get_sec_yield(symbol)
             if sec_yield is not None:
@@ -169,12 +168,6 @@ def scrape_vanguard_yields(args, output):
                 output.append(f"✅ Scraped SEC yield for {symbol}: {sec_yield}%")
             else:
                 output.append(f"❌ Failed to scrape SEC yield for {symbol}")
-    return output
-
-
-def scrape_ally_apy(args, output):
-    """Scrape current APY from Ally Bank and update args."""
-    with AllyScraper(headless=True) as scraper:
         apy = scraper.get_apy()
         if apy is not None:
             args.hysa = apy
@@ -249,8 +242,7 @@ if __name__ == "__main__":
 
     args = parse_args()
     if args.scrape:
-        output = scrape_vanguard_yields(args, output)
-        output = scrape_ally_apy(args, output)
+        output = scrape_yields(args, output)
 
     output = compute(args, output)
 
