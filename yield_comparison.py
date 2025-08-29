@@ -18,6 +18,7 @@ import argparse
 
 from vanguard_scraper import VanguardScraper
 from ally_scraper import AllyScraper
+from datetime import timezone, timedelta
 
 
 VUSXX_YIELD = 4.24
@@ -255,7 +256,8 @@ if __name__ == "__main__":
 
     if args.add_results:
         # Add date header and code block to output
-        today = datetime.now().strftime("%Y-%m-%d")
+        pst = timezone(timedelta(hours=-8))
+        today = datetime.now(pst).strftime("%Y-%m-%d %H:%M:%S PST")
         output = [f"\n## {today}\n```" + "\n".join(output) + "\n```"]
 
         with open("results.md", "a") as f:

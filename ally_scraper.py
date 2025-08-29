@@ -70,7 +70,7 @@ class AllyScraper:
         url = "https://www.ally.com/bank/online-savings-account/"
 
         try:
-            print(f"Fetching Ally Bank APY from {url}
+            print(f"Fetching Ally Bank APY from {url}")
             self.driver.get(url)
 
             # Wait for page to load
