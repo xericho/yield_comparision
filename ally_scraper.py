@@ -70,7 +70,7 @@ class AllyScraper:
         url = "https://www.ally.com/bank/online-savings-account/"
 
         try:
-            print(f"Fetching Ally Bank APY from {url}...")
+            print(f"Fetching Ally Bank APY from {url}
             self.driver.get(url)
 
             # Wait for page to load
@@ -226,7 +226,7 @@ class AllyScraper:
     def close(self):
         """Close the browser driver."""
         if self.driver:
-            self.driver.quit()
+            self.driver.close()
 
     def __enter__(self):
         return self

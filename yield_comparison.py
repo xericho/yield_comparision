@@ -69,7 +69,7 @@ def add_common_instruments(args) -> List[Instrument]:
     ]
 
 
-def compute(args, output: list) -> None:
+def compute(args, output: list) -> list:
     instruments = add_common_instruments(args)
     fed_rate = args.fed / 100.0
     state_rate = args.state / 100.0
@@ -81,7 +81,7 @@ def compute(args, output: list) -> None:
     output.append("\nInput yields:")
     output.append(f"  VUSXX: {args.vusxx}%")
     output.append(f"  VCTXX: {args.vctxx}%")
-    output.append(f"  HYSA: {args.hysa}%")
+    output.append(f"  Ally HYSA: {args.hysa}%")
 
     output.append("\nAfter-tax yields:")
 
@@ -154,6 +154,7 @@ def compute(args, output: list) -> None:
 
     # Print all collected output at the end
     print("\n".join(output))
+    return output
 
 
 def scrape_vanguard_yields(args, output):
@@ -167,6 +168,7 @@ def scrape_vanguard_yields(args, output):
                 output.append(f"✅ Scraped SEC yield for {symbol}: {sec_yield}%")
             else:
                 output.append(f"❌ Failed to scrape SEC yield for {symbol}")
+    return output
 
 
 def scrape_ally_apy(args, output):
@@ -178,6 +180,7 @@ def scrape_ally_apy(args, output):
             output.append(f"✅ Scraped APY for Ally: {apy}%")
         else:
             output.append(f"❌ Failed to scrape APY for Ally")
+    return output
 
 
 def parse_args():
@@ -245,10 +248,10 @@ if __name__ == "__main__":
 
     args = parse_args()
     if args.scrape:
-        scrape_ally_apy(args, output)
-        scrape_vanguard_yields(args, output)
+        output = scrape_vanguard_yields(args, output)
+        output = scrape_ally_apy(args, output)
 
-    compute(args, output)
+    output = compute(args, output)
 
     if args.add_results:
         # Add date header and code block to output

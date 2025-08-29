@@ -74,7 +74,7 @@ class VanguardScraper:
         url = f"https://investor.vanguard.com/investment-products/mutual-funds/profile/{symbol.lower()}"
 
         try:
-            print(f"Fetching {symbol.upper()} from {url}...")
+            print(f"Fetching {symbol.upper()} from {url}")
             self.driver.get(url)
 
             # Wait for page to load
@@ -189,7 +189,7 @@ class VanguardScraper:
     def close(self):
         """Close the browser driver."""
         if self.driver:
-            self.driver.quit()
+            self.driver.close()
 
     def __enter__(self):
         return self
