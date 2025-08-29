@@ -15,6 +15,9 @@ from dataclasses import dataclass
 from typing import List
 import argparse
 
+from vanguard_scraper import VanguardScraper
+from ally_scraper import AllyScraper
+
 
 VUSXX_YIELD = 4.24
 VCTXX_YIELD = 2.36
@@ -70,8 +73,14 @@ def compute(args) -> None:
     fed_rate = args.fed / 100.0
     state_rate = args.state / 100.0
 
-    print(f"Principal: ${args.principal:,.2f}\n")
-    print("After-tax yields:")
+    print(f"\nPrincipal: ${args.principal:,.2f}")
+
+    print("\nInput yields:")
+    print(f"  VUSXX: {format_pct(args.vusxx)}")
+    print(f"  VCTXX: {format_pct(args.vctxx)}")
+    print(f"  HYSA: {format_pct(args.hysa)}")
+
+    print("\nAfter-tax yields:")
 
     results = []
     for inst in instruments:
@@ -139,6 +148,24 @@ def compute(args) -> None:
             )
 
 
+def get_vanguard_yields(args):
+    """Scrape current SEC yields from Vanguard and update args."""
+    symbols = ["vusxx", "vctxx"]
+    with VanguardScraper(headless=True) as scraper:
+        for symbol in symbols:
+            sec_yield = scraper.get_sec_yield(symbol)
+            if sec_yield is not None:
+                args.__setattr__(symbol, sec_yield)
+
+
+def get_ally_apy(args):
+    """Scrape current APY from Ally Bank and update args."""
+    with AllyScraper(headless=True) as scraper:
+        apy = scraper.get_apy()
+        if apy is not None:
+            args.hysa = apy
+
+
 def parse_args():
     p = argparse.ArgumentParser(
         description="Compare after-tax yields: VUSXX vs VCTXX vs HYSA"
@@ -190,6 +217,8 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
+    get_vanguard_yields(args)
+    get_ally_apy(args)
     compute(args)
 
     print(
