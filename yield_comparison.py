@@ -20,9 +20,10 @@ from selenium_scraper import YieldScraper
 from datetime import timezone, timedelta
 
 
-VUSXX_YIELD = 4.24
-VCTXX_YIELD = 2.36
-HYSA_APY = 3.5
+# Default yields if scraping fails
+DEFAULT_VUSXX_YIELD = 4.24
+DEFAULT_VCTXX_YIELD = 2.36
+DEFAULT_HYSA_APY = 3.5
 
 
 @dataclass
