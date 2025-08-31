@@ -196,19 +196,19 @@ def parse_args():
         "--vusxx",
         type=float,
         default=DEFAULT_VUSXX_YIELD,
-        help=f"VUSXX SEC yield percent (default {VUSXX_YIELD})",
+        help=f"VUSXX SEC yield percent (default {DEFAULT_VUSXX_YIELD})",
     )
     p.add_argument(
         "--vctxx",
         type=float,
         default=DEFAULT_VCTXX_YIELD,
-        help=f"VCTXX SEC yield percent (default {VCTXX_YIELD})",
+        help=f"VCTXX SEC yield percent (default {DEFAULT_VCTXX_YIELD})",
     )
     p.add_argument(
         "--hysa",
         type=float,
         default=DEFAULT_HYSA_APY,
-        help=f"HYSA APY percent (default {HYSA_APY})",
+        help=f"HYSA APY percent (default {DEFAULT_HYSA_APY})",
     )
     p.add_argument(
         "--fed",
