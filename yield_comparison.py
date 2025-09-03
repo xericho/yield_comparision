@@ -264,7 +264,7 @@ if __name__ == "__main__":
     if args.add_results:
         # Add date header and code block to output
         output = output1 + output2
-        output = f"\n\n## {today}\n```\n" + "\n".join(output) + "\n```"
+        output = f"\n## {today}\n```\n" + "\n".join(output) + "\n```\n"
 
         # Read existing file or create new one with header
         with open("results.md", "r") as f:
