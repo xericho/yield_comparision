@@ -28,12 +28,15 @@ jobs:
         run: |
           python yield_comparison.py --scrape --add_results > output.txt 
       - name: Send ntfy notification
+        env:
+          NTFY_CRED: ${{ secrets.NTFY_CRED }}
+          NTFY_URL: ${{ secrets.NTFY_URL }}
         run: |
           curl \
-            -u ${{ secrets.NTFY_CRED }} \
+            -u $NTFY_CRED \
             -H "Title: `date +%Y-%m-%d`" \
             -d '$(cat output.txt)' \
-            ${{ secrets.NTFY_URL }}
+            $NTFY_URL
       - name: Commit and push results
         run: |
           git config user.name "${{ github.actor }}"
