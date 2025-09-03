@@ -6,7 +6,6 @@ on:
 jobs:
   calculate_yields:
     runs-on: ubuntu-latest
-    environment: yield_comparison
     steps:
       - name: Checking out repo
         uses: actions/checkout@v4
@@ -26,7 +25,7 @@ jobs:
         env:
           NTFY_CREDS: ${{ secrets.NTFY_CREDS }}
           NTFY_URL: ${{ secrets.NTFY_URL }}
-        run: python yield_comparison.py --scrape --add_results --ntfy
+        run: echo $NTFY_CREDS && echo $NTFY_URL && python yield_comparison.py --scrape --add_results --ntfy
       - name: Commit and push results
         run: |
           git config user.name "${{ github.actor }}"

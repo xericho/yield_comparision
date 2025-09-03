@@ -280,9 +280,7 @@ if __name__ == "__main__":
     if args.ntfy:
         ntfy_creds = os.getenv("NTFY_CREDS", "")  # base64 access token
         ntfy_url = os.getenv("NTFY_URL", "")
-        # Combine output1 and output2 for notification
         notification_message = "\n".join(output1 + output2)
-        # Use requests to send notification
         response = requests.post(
             ntfy_url,
             headers={
