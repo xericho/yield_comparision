@@ -26,20 +26,18 @@ jobs:
       - name: Running the Python script
         id: python_output
         run: |
-          python yield_comparison.py --scrape --add_results > output.txt && \
-          echo "RESULTS=$(cat output.txt)" >> "$GITHUB_OUTPUT"
+          python yield_comparison.py --scrape --add_results > output.txt 
+      - name: Send ntfy notification
+        run: |
+          curl \
+            -u ${{ secrets.NTFY_CRED }} \
+            -H "Title: `date +%Y-%m-%d`" \
+            -d '$(cat output.txt)' \
+            ${{ secrets.NTFY_URL }}
       - name: Commit and push results
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-          git add -A
+          git add results.md
           git commit -m "GitHub Actions results updated"
           git push
-      - name: Send ntfy notification
-        run: |
-          echo ${ steps.python_output.outputs.RESULTS } && \
-          curl \
-            -u ${{ secrets.NTFY_CRED }} \
-            -H "Title: `date +%Y-%m-%d`" \
-            -d '${{ steps.python_output.outputs.RESULTS }}' \
-            ${{ secrets.NTFY_URL }}
