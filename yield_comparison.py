@@ -11,6 +11,8 @@ Assumptions:
 
 from __future__ import annotations
 
+import os
+import requests
 from dataclasses import dataclass
 from typing import List
 from datetime import datetime
@@ -70,7 +72,7 @@ def add_common_instruments(args) -> List[Instrument]:
     ]
 
 
-def compute(args) -> list:
+def compute(args) -> list[str]:
     output = []
     instruments = add_common_instruments(args)
     fed_rate = args.fed / 100.0
@@ -159,7 +161,7 @@ def compute(args) -> list:
     return output
 
 
-def scrape_yields(args) -> list:
+def scrape_yields(args) -> list[str]:
     """Scrape current SEC yields from Vanguard and update args."""
     output = []
     symbols = ["vusxx", "vctxx"]
@@ -241,11 +243,19 @@ def parse_args():
         action="store_true",
         help="Add results to results.md",
     )
+    p.add_argument(
+        "--ntfy",
+        action="store_true",
+        help="Send notification via ntfy (requires env vars NTFY_CRED and NTFY_URL)",
+    )
     return p.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
+
+    output1, output2 = [], []
+
     if args.scrape:
         output1 = scrape_yields(args)
 
@@ -255,7 +265,7 @@ if __name__ == "__main__":
         # Add date header and code block to output
         today = datetime.now().strftime("%Y-%m-%d")
         output = output1 + output2
-        output = f"\n## {today}\n```\n" + "\n".join(output) + "\n```"
+        output = f"\n\n## {today}\n```\n" + "\n".join(output) + "\n```"
 
         # Read existing file or create new one with header
         with open("results.md", "r") as f:
@@ -267,3 +277,18 @@ if __name__ == "__main__":
         # Write back to file
         with open("results.md", "w") as f:
             f.writelines(lines)
+
+    if args.ntfy:
+        ntfy_cred = os.getenv("NTFY_CRED", "")  # base64 access token
+        ntfy_url = os.getenv("NTFY_URL", "")
+        # Combine output1 and output2 for notification
+        notification_message = "\n".join(output1 + output2)
+        # Use requests to send notification
+        response = requests.post(
+            ntfy_url,
+            headers={
+                "Title": datetime.now().strftime("%Y-%m-%d"),
+                "Authorization": f"Bearer {ntfy_cred}",
+            },
+            data=notification_message.encode(encoding="utf-8"),
+        )
