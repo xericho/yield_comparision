@@ -24,7 +24,7 @@ jobs:
         run: pip install chromedriver-autoinstaller webdriver_manager selenium pyvirtualdisplay beautifulsoup4 lxml
       - name: Running the Python script
         env:
-          NTFY_CRED: ${{ secrets.NTFY_CRED }}
+          NTFY_CREDS: ${{ secrets.NTFY_CREDS }}
           NTFY_URL: ${{ secrets.NTFY_URL }}
         run: python yield_comparison.py --scrape --add_results --ntfy
       - name: Commit and push results

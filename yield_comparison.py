@@ -278,7 +278,7 @@ if __name__ == "__main__":
             f.writelines(lines)
 
     if args.ntfy:
-        ntfy_cred = os.getenv("NTFY_CRED", "")  # base64 access token
+        ntfy_creds = os.getenv("NTFY_CREDS", "")  # base64 access token
         ntfy_url = os.getenv("NTFY_URL", "")
         # Combine output1 and output2 for notification
         notification_message = "\n".join(output1 + output2)
@@ -287,7 +287,7 @@ if __name__ == "__main__":
             ntfy_url,
             headers={
                 "Title": today,
-                "Authorization": f"Bearer {ntfy_cred}",
+                "Authorization": f"Bearer {ntfy_creds}",
             },
             data=notification_message.encode(encoding="utf-8"),
         )
