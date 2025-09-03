@@ -26,9 +26,8 @@ jobs:
       - name: Running the Python script
         id: python_output
         run: |
-          echo "RESULTS=<<EOF" >> $GITHUB_OUTPUT
-          python yield_comparison.py --scrape --add_results >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT 
+          python yield_comparison.py --scrape --add_results > output.txt
+          echo "RESULTS=$(cat output.txt)" >> "$GITHUB_OUTPUT"
       - name: Commit and push results
         run: |
           git config user.name "${{ github.actor }}"
