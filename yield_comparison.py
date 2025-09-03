@@ -19,7 +19,6 @@ from datetime import datetime
 import argparse
 
 from selenium_scraper import YieldScraper
-from datetime import timezone, timedelta
 
 
 # Default yields if scraping fails
