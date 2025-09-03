@@ -280,8 +280,6 @@ if __name__ == "__main__":
     if args.ntfy:
         ntfy_creds = os.getenv("NTFY_CREDS")  # base64 access token
         ntfy_url = os.getenv("NTFY_URL")
-        print(f"NTFY_CREDS: {ntfy_creds}")
-        print(f"NTFY_URL: {ntfy_url}")
         notification_message = "\n".join(output1 + output2)
         response = requests.post(
             "https://ntfy.sh/yield-comparison",
