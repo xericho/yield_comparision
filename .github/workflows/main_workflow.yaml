@@ -6,6 +6,7 @@ on:
 jobs:
   calculate_yields:
     runs-on: ubuntu-latest
+    environment: yield_comparison
     steps:
       - name: Checking out repo
         uses: actions/checkout@v4

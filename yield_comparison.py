@@ -253,6 +253,7 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
+    today = datetime.now().strftime("%Y-%m-%d")
     output1, output2 = [], []
 
     if args.scrape:
@@ -262,7 +263,6 @@ if __name__ == "__main__":
 
     if args.add_results:
         # Add date header and code block to output
-        today = datetime.now().strftime("%Y-%m-%d")
         output = output1 + output2
         output = f"\n\n## {today}\n```\n" + "\n".join(output) + "\n```"
 
@@ -286,7 +286,7 @@ if __name__ == "__main__":
         response = requests.post(
             ntfy_url,
             headers={
-                "Title": datetime.now().strftime("%Y-%m-%d"),
+                "Title": today,
                 "Authorization": f"Bearer {ntfy_cred}",
             },
             data=notification_message.encode(encoding="utf-8"),
