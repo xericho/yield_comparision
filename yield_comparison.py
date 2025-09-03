@@ -179,6 +179,8 @@ def scrape_yields(args) -> list:
             output.append(f"✅ Scraped APY for Ally: {apy}%")
         else:
             output.append(f"❌ Failed to scrape APY for Ally")
+
+    print("\n".join(output))
     return output
 
 

@@ -26,7 +26,7 @@ jobs:
       - name: Running the Python script
         id: python_output
         run: |
-          echo "RESULTS<<EOF" >> $GITHUB_OUTPUT
+          echo "RESULTS=<<EOF" >> $GITHUB_OUTPUT
           python yield_comparison.py --scrape --add_results >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT 
       - name: Commit and push results
@@ -38,8 +38,9 @@ jobs:
           git push
       - name: Send ntfy notification
         run: |
+          echo ${ steps.python_output.outputs.RESULTS } && \
           curl \
             -u ${{ secrets.NTFY_CRED }} \
-            -H "Title: Title here" \
-            -d $'${{ steps.python_output.outputs.RESULTS }}' \
+            -H "Title: `date +%Y-%m-%d`" \
+            -d '${{ steps.python_output.outputs.RESULTS }}' \
             ${{ secrets.NTFY_URL }}

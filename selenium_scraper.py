@@ -72,7 +72,6 @@ class YieldScraper:
         url = f"https://investor.vanguard.com/investment-products/mutual-funds/profile/{symbol.lower()}"
 
         try:
-            print(f"Fetching {symbol.upper()} from {url}")
             self.driver.get(url)
 
             # Wait for page to load
@@ -90,10 +89,8 @@ class YieldScraper:
             sec_yield = self._extract_sec_yield_from_soup(soup)
 
             if sec_yield is not None:
-                print(f"✅ Found SEC yield for {symbol.upper()}: {sec_yield}%")
                 return sec_yield
 
-            print(f"❌ SEC yield not found for {symbol.upper()}")
             return None
 
         except TimeoutException:
@@ -162,7 +159,6 @@ class YieldScraper:
         url = "https://www.ally.com/bank/online-savings-account/"
 
         try:
-            print(f"Fetching Ally Bank APY from {url}")
             self.driver.get(url)
 
             # Wait for page to load
@@ -179,22 +175,18 @@ class YieldScraper:
             # Strategy 1: Look for APY in various text patterns
             apy = self._extract_apy_from_text(soup)
             if apy is not None:
-                print(f"✅ Found Ally Bank APY: {apy}%")
                 return apy
 
             # Strategy 2: Look for APY in specific elements or data attributes
             apy = self._extract_apy_from_elements(soup)
             if apy is not None:
-                print(f"✅ Found Ally Bank APY: {apy}%")
                 return apy
 
             # Strategy 3: Look for rate information in tables or structured data
-            apy = self._extract_apy_from_structured_data(soup)
-            if apy is not None:
-                print(f"✅ Found Ally Bank APY: {apy}%")
-                return apy
+            # apy = self._extract_apy_from_structured_data(soup)
+            # if apy is not None:
+            #     return apy
 
-            print("❌ Ally Bank APY not found")
             return None
 
         except TimeoutException:
