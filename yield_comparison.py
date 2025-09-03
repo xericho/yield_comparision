@@ -284,10 +284,11 @@ if __name__ == "__main__":
         print(f"NTFY_URL: {ntfy_url}")
         notification_message = "\n".join(output1 + output2)
         response = requests.post(
-            ntfy_url,
+            "https://ntfy.sh/yield-comparison",
+            # ntfy_url,
             headers={
                 "Title": today,
-                "Authorization": f"Bearer {ntfy_creds}",
+                # "Authorization": f"Bearer {ntfy_creds}",
             },
             data=notification_message.encode(encoding="utf-8"),
         )
