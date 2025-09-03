@@ -26,7 +26,7 @@ jobs:
       - name: Running the Python script
         id: python_output
         run: |
-          python yield_comparison.py --scrape --add_results > output.txt
+          python yield_comparison.py --scrape --add_results > output.txt && \
           echo "RESULTS=$(cat output.txt)" >> "$GITHUB_OUTPUT"
       - name: Commit and push results
         run: |
