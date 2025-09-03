@@ -20,9 +20,10 @@ from selenium_scraper import YieldScraper
 from datetime import timezone, timedelta
 
 
-VUSXX_YIELD = 4.24
-VCTXX_YIELD = 2.36
-HYSA_APY = 3.5
+# Default yields if scraping fails
+DEFAULT_VUSXX_YIELD = 4.24
+DEFAULT_VCTXX_YIELD = 2.36
+DEFAULT_HYSA_APY = 3.5
 
 
 @dataclass
@@ -194,20 +195,20 @@ def parse_args():
     p.add_argument(
         "--vusxx",
         type=float,
-        default=VUSXX_YIELD,
-        help=f"VUSXX SEC yield percent (default {VUSXX_YIELD})",
+        default=DEFAULT_VUSXX_YIELD,
+        help=f"VUSXX SEC yield percent (default {DEFAULT_VUSXX_YIELD})",
     )
     p.add_argument(
         "--vctxx",
         type=float,
-        default=VCTXX_YIELD,
-        help=f"VCTXX SEC yield percent (default {VCTXX_YIELD})",
+        default=DEFAULT_VCTXX_YIELD,
+        help=f"VCTXX SEC yield percent (default {DEFAULT_VCTXX_YIELD})",
     )
     p.add_argument(
         "--hysa",
         type=float,
-        default=HYSA_APY,
-        help=f"HYSA APY percent (default {HYSA_APY})",
+        default=DEFAULT_HYSA_APY,
+        help=f"HYSA APY percent (default {DEFAULT_HYSA_APY})",
     )
     p.add_argument(
         "--fed",
