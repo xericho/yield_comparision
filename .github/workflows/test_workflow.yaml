@@ -1,4 +1,4 @@
-name: Calculate Yields
+name: Test Workflow
 on:
   workflow_dispatch:
   push:
@@ -19,4 +19,4 @@ jobs:
           python-version: "3.11"
       - name: Run python
         run: |
-          python -c "import os; print(os.getenv('NTFY_URL')[:-2])"
+          python -c "import os; print(os.getenv('NTFY_CREDS')[:-1])"
