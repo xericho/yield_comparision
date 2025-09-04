@@ -8,8 +8,8 @@ jobs:
   test_job:
     runs-on: ubuntu-latest
     env:
-      NTFY_CREDS: ${{ secrets.NTFY_CREDS }}
       NTFY_URL: ${{ secrets.NTFY_URL }}
+      NTFY_CREDS: ${{ secrets.NTFY_CREDS }}
     steps:
       - name: Checking out repo
         uses: actions/checkout@v4
@@ -20,4 +20,4 @@ jobs:
       - name: Run python
         run: |
           pip install requests && \
-          python -c "import os, requests; requests.post(os.getenv('NTFY_URL'),headers={'Authorization': f'Bearer {os.getenv("NTFY_CREDS")}'},data='Hello world')"
+          python -c "import os, requests; requests.post(os.getenv('NTFY_URL'),headers={'Authorization': 'Bearer '+os.getenv('NTFY_CREDS')},data='Hello world')"
