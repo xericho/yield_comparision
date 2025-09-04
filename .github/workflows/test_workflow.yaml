@@ -1,6 +1,9 @@
 name: Calculate Yields
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - gh_secrets_fix
 jobs:
   test_job:
     runs-on: ubuntu-latest
