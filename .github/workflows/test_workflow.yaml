@@ -19,4 +19,4 @@ jobs:
           python-version: "3.11"
       - name: Run python
         run: |
-          python -c "import os; print(os.getenv('NTFY_CREDS')[:-1])"
+          python -c "import os, requests; requests.post(os.getenv('NTFY_URL'),headers={'Authorization': f'Bearer {os.getenv("NTFY_CREDS")}'},data='Hello world')"
