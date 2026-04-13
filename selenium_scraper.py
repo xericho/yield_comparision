@@ -156,7 +156,8 @@ class YieldScraper:
         Optional[float]
             APY as percentage (e.g., 4.20 for 4.20%), or None if not found
         """
-        url = "https://www.ally.com/bank/online-savings-account/"
+        # url = "https://www.ally.com/bank/online-savings-account/"
+        url = "https://www.ally.com/bank/savings-account-rates/"
 
         try:
             self.driver.get(url)
