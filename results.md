@@ -1,5 +1,29 @@
 # Yield Comparison Results
 
+## 2026-07-11
+```
+✅ Scraped SEC yield for VUSXX: 3.64%
+✅ Scraped SEC yield for VCTXX: 1.36%
+✅ Scraped APY for Ally: 3.0%
+
+Principal: $100,000.00
+
+Input yields:
+  VUSXX: 3.64%
+  VCTXX: 1.36%
+  HYSA: 3.0%
+
+After-tax yields:
+  1. VUSXX: 2.4752% -> $2,475
+  2. HYSA: 1.7610% -> $1,761
+  3. VCTXX: 1.3600% -> $1,360
+
+Annual dollar differences:
+  VUSXX - HYSA: $714 (+40.56%)
+  VUSXX - VCTXX: $1,115 (+82.00%)
+  VCTXX - HYSA: $-401 (-22.77%)
+```
+
 ## 2026-07-10
 ```
 ✅ Scraped SEC yield for VUSXX: 3.63%
