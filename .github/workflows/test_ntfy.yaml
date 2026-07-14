@@ -1,4 +1,4 @@
-name: Calculate Yields
+name: Test ntfy
 on:
   workflow_dispatch:
 jobs:
