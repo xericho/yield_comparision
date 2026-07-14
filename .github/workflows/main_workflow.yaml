@@ -2,7 +2,7 @@ name: Calculate Yields
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 jobs:
   calculate_yields:
     runs-on: ubuntu-latest
@@ -12,16 +12,23 @@ jobs:
     steps:
       - name: Checking out repo
         uses: actions/checkout@v4
+      - name: Bypass Cloudflare for Github Actions
+        uses: xiaotianxt/bypass-cloudflare-for-github-action@v2.1.0
+        with:
+          cf_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          cf_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          cf_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          disable_bot_fight_mode: "true"
       - name: Setting up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
       - name: Update packages
         run: sudo apt-get update
       - name: Install xvfb
         run: sudo apt-get install xvfb
-      # - name: Removing previous chrome instances on runner 
-      #   run: sudo apt purge google-chrome-stable  
+      # - name: Removing previous chrome instances on runner
+      #   run: sudo apt purge google-chrome-stable
       - name: Installing all necessary packages
         run: pip install chromedriver-autoinstaller webdriver_manager selenium pyvirtualdisplay beautifulsoup4 lxml
       - name: Running the Python script
@@ -33,3 +40,4 @@ jobs:
           git add results.md
           git commit -m "GitHub Actions results updated"
           git push
+
