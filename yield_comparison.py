@@ -169,9 +169,7 @@ def scrape_yields(args) -> list[str]:
             sec_yield = scraper.get_sec_yield(symbol)
             if sec_yield is not None:
                 args.__setattr__(symbol, sec_yield)
-                output.append(
-                    f"✅ Scraped SEC yield for {symbol.upper()}: {sec_yield}%"
-                )
+                output.append(f"✅ Scraped SEC yield for {symbol.upper()}: {sec_yield}%")
             else:
                 output.append(f"❌ Failed to scrape SEC yield for {symbol.upper()}")
         apy = scraper.get_apy()
@@ -281,6 +279,7 @@ if __name__ == "__main__":
         ntfy_creds = os.getenv("NTFY_CREDS")  # base64 access token
         ntfy_url = os.getenv("NTFY_URL")
         notification_message = "\n".join(output1 + output2)
+        print(f"Sending notification to {ntfy_url}")
         response = requests.post(
             # "https://ntfy.sh/yield-comparison",
             ntfy_url,
