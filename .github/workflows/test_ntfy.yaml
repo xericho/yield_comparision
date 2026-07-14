@@ -1,0 +1,20 @@
+name: Calculate Yields
+on:
+  workflow_dispatch:
+jobs:
+  test_ntfy:
+    runs-on: ubuntu-latest
+    env:
+      NTFY_CREDS: ${{ secrets.NTFY_CREDS }}
+      NTFY_URL: ${{ secrets.NTFY_URL }}
+    steps:
+      - name: Checking out repo
+        uses: actions/checkout@v4
+      - name: Setting up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Update packages
+        run: sudo apt-get update
+      - name: Running the Python script
+        run: python yield_comparison.py --ntfy
