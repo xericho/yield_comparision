@@ -1,22 +1,22 @@
 import unittest
-
-from bs4 import BeautifulSoup
+from unittest.mock import patch
 
 from selenium_scraper import YieldScraper
 
 
 class VanguardYieldTest(unittest.TestCase):
-    def test_extracts_sec_yield_from_vanguard_api_response(self):
-        soup = BeautifulSoup(
-            '<pre>{"dashboard":{"secYield":"3.70%"}}</pre>', "html.parser"
+    @patch("selenium_scraper.urlopen")
+    def test_gets_sec_yield_from_vanguard_api(self, get):
+        get.return_value.__enter__.return_value.read.return_value = (
+            b'{"dashboard":{"secYield":"3.70%"}}'
         )
+        scraper = YieldScraper.__new__(YieldScraper)
+        scraper.timeout = 10
 
-        self.assertEqual(YieldScraper._extract_sec_yield_from_soup(None, soup), 3.70)
-
-        soup = BeautifulSoup(
-            '<pre>{"dashboard":{"secYield":"30.00%"}}</pre>', "html.parser"
+        self.assertEqual(scraper.get_sec_yield("vusxx"), 3.70)
+        get.assert_called_once_with(
+            "https://investor.vanguard.com/irr/funds/profile/VUSXX", timeout=10
         )
-        self.assertIsNone(YieldScraper._extract_sec_yield_from_soup(None, soup))
 
 
 if __name__ == "__main__":

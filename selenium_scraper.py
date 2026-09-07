@@ -2,6 +2,7 @@ import json
 import time
 import re
 from typing import Optional, Dict
+from urllib.request import urlopen
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -73,66 +74,13 @@ class YieldScraper:
         url = f"https://investor.vanguard.com/irr/funds/profile/{symbol.upper()}"
 
         try:
-            self.driver.get(url)
-
-            # Wait for page to load
-            WebDriverWait(self.driver, self.timeout).until(
-                EC.presence_of_element_located((By.TAG_NAME, "body"))
-            )
-
-            # Get page source and parse with BeautifulSoup
-            soup = BeautifulSoup(self.driver.page_source, "html.parser")
-
-            # Strategy 1: Look for SEC yield in various possible locations
-            sec_yield = self._extract_sec_yield_from_soup(soup)
-
-            if sec_yield is not None:
-                return sec_yield
-
-            return None
-
-        except TimeoutException:
-            print(f"Timeout loading page for {symbol.upper()}")
-            return None
+            with urlopen(url, timeout=self.timeout) as response:
+                sec_yield = json.load(response)["dashboard"]["secYield"]
+            yield_value = float(sec_yield.rstrip("%"))
+            return yield_value if 0 <= yield_value <= 20 else None
         except Exception as e:
             print(f"Error scraping {symbol.upper()}: {str(e)}")
             return None
-
-    def _extract_sec_yield_from_soup(self, soup: BeautifulSoup) -> Optional[float]:
-        """Extract SEC yield using various text patterns."""
-
-        # Common patterns for SEC yield
-        patterns = [
-            r"SEC yield[:\s]*(\d+\.?\d*)\s*%",
-            r"SEC\s+yield[:\s]*(\d+\.?\d*)\s*%",
-            r"30-day SEC yield[:\s]*(\d+\.?\d*)\s*%",
-            r"Yield[:\s]*(\d+\.?\d*)\s*%",
-            r"7 day SEC yield[:\s]*(\d+\.?\d*)\s*%",
-        ]
-
-        # Get all text content
-        text = soup.get_text()
-
-        try:
-            sec_yield = json.loads(text)["dashboard"]["secYield"]
-            yield_value = float(sec_yield.rstrip("%"))
-            if 0 <= yield_value <= 20:
-                return yield_value
-        except (KeyError, TypeError, ValueError, json.JSONDecodeError):
-            pass
-
-        for pattern in patterns:
-            matches = re.finditer(pattern, text, re.IGNORECASE)
-            for match in matches:
-                try:
-                    yield_value = float(match.group(1))
-                    # Sanity check: yield should be reasonable (0-20%)
-                    if 0 <= yield_value <= 20:
-                        return yield_value
-                except (ValueError, IndexError):
-                    continue
-
-        return None
 
     def get_multiple_yields(self, symbols: list) -> Dict[str, Optional[float]]:
         """Get SEC yields for multiple symbols.
@@ -151,7 +99,7 @@ class YieldScraper:
         for symbol in symbols:
             results[symbol.upper()] = self.get_sec_yield(symbol)
             # Small delay between requests to be respectful
-            time.sleep(1)
+            # time.sleep(1)
 
         return results
 
