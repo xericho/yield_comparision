@@ -1,3 +1,4 @@
+import json
 import time
 import re
 from typing import Optional, Dict
@@ -69,7 +70,7 @@ class YieldScraper:
         Optional[float]
             SEC yield as percentage (e.g., 4.24 for 4.24%), or None if not found
         """
-        url = f"https://investor.vanguard.com/investment-products/mutual-funds/profile/{symbol.lower()}"
+        url = f"https://investor.vanguard.com/irr/funds/profile/{symbol.upper()}"
 
         try:
             self.driver.get(url)
@@ -78,9 +79,6 @@ class YieldScraper:
             WebDriverWait(self.driver, self.timeout).until(
                 EC.presence_of_element_located((By.TAG_NAME, "body"))
             )
-
-            # Additional wait for dynamic content
-            time.sleep(2)
 
             # Get page source and parse with BeautifulSoup
             soup = BeautifulSoup(self.driver.page_source, "html.parser")
@@ -109,10 +107,19 @@ class YieldScraper:
             r"SEC\s+yield[:\s]*(\d+\.?\d*)\s*%",
             r"30-day SEC yield[:\s]*(\d+\.?\d*)\s*%",
             r"Yield[:\s]*(\d+\.?\d*)\s*%",
+            r"7 day SEC yield[:\s]*(\d+\.?\d*)\s*%",
         ]
 
         # Get all text content
         text = soup.get_text()
+
+        try:
+            sec_yield = json.loads(text)["dashboard"]["secYield"]
+            yield_value = float(sec_yield.rstrip("%"))
+            if 0 <= yield_value <= 20:
+                return yield_value
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+            pass
 
         for pattern in patterns:
             matches = re.finditer(pattern, text, re.IGNORECASE)
